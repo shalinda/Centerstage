@@ -3,16 +3,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 
@@ -23,9 +20,9 @@ public class AutoJava extends LinearOpMode {
     private DcMotorEx left_drive1;
     private DcMotorEx left_drive2;
     private ArrayList<String> movements = new ArrayList<>();
-    private volatile SleeveDetection.ParkingPosition pos;
+//    private volatile SleeveDetection.ParkingPosition pos;
 
-    SleeveDetection sleeveDetection;
+    PixelDetection pixelDetection;
     OpenCvCamera camera;
     String webcamName = "Webcam 1";
 
@@ -57,8 +54,8 @@ public class AutoJava extends LinearOpMode {
         initMotors();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetection();
-        camera.setPipeline(sleeveDetection);
+        pixelDetection = new PixelDetection();
+        camera.setPipeline(pixelDetection);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -76,12 +73,13 @@ public class AutoJava extends LinearOpMode {
         });
 
         while (!isStarted()) {
-
+/*
             telemetry.addData("YCM: ", sleeveDetection.getYelPercent() + " " +
                     sleeveDetection.getCyaPercent() + " " + sleeveDetection.getMagPercent());
             telemetry.addData("ROTATION1: ", sleeveDetection.getPosition());
             telemetry.update();
-            pos = sleeveDetection.getPosition();
+            pos = sleeveDetection.getPosition();*/
+
         }
 
 

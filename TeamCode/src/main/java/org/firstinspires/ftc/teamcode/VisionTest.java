@@ -11,18 +11,21 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name = "Signal Sleeve Test")
 public class VisionTest extends LinearOpMode {
 
-    SleeveDetection sleeveDetection;
+    PixelDetection pixelDetection;
     OpenCvCamera camera;
 
     // Name of the Webcam to be set in the config
     String webcamName = "Webcam 1";
 
+
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetection();
-        camera.setPipeline(sleeveDetection);
+        pixelDetection = new PixelDetection();
+        camera.setPipeline(pixelDetection);
+
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -39,10 +42,11 @@ public class VisionTest extends LinearOpMode {
             }
         });
 
+
         while (!isStarted()) {
-            telemetry.addData("YCM: ", sleeveDetection.getYelPercent() + " " +
-                    sleeveDetection.getCyaPercent() + " " + sleeveDetection.getMagPercent());
-            telemetry.addData("ROTATION1: ", sleeveDetection.getPosition());
+            telemetry.addData("Yel percent of LCR mats:", pixelDetection.getLeftYelPercent() + " "
+                + pixelDetection.getCenterYelPercent() + " " + pixelDetection.getRightYelPercent());
+            telemetry.addData("ROTATION1: ", pixelDetection.getPosition());
             telemetry.update();
         }
 

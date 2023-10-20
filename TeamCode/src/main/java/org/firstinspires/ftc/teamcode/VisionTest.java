@@ -11,11 +11,11 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name = "Signal Sleeve Test")
 public class VisionTest extends LinearOpMode {
 
-    PixelDetection pixelDetection;
-    OpenCvCamera camera;
+    private PixelDetection pixelDetection;
+    private OpenCvCamera camera;
 
     // Name of the Webcam to be set in the config
-    String webcamName = "Webcam 1";
+    private String webcamName = "Webcam 1";
 
 
     @Override
@@ -44,8 +44,8 @@ public class VisionTest extends LinearOpMode {
 
 
         while (!isStarted()) {
-            telemetry.addData("Yel percent of LCR mats:", pixelDetection.getLeftYelPercent() + " "
-                + pixelDetection.getCenterYelPercent() + " " + pixelDetection.getRightYelPercent());
+            telemetry.addData("White percent of LCR mats:", pixelDetection.getLeftWhitePercent() + " "
+                + pixelDetection.getCenterWhitePercent() + " " + pixelDetection.getRightWhitePercent());
             telemetry.addData("ROTATION1: ", pixelDetection.getPosition());
             telemetry.update();
         }

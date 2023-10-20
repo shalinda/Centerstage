@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Arrays;
 
-public class PixelDetection extends OpenCvPipeline {
+public class PixelDetectionThreeColors extends OpenCvPipeline {
 
 
     public enum BackdropPosition {
@@ -35,12 +35,21 @@ public class PixelDetection extends OpenCvPipeline {
     private static final int REGION_HEIGHT = 40;
 
     // Lower and upper boundaries for colors
+    // TODO: may need to adjust red and blue color bounds to mostly detect just the team prop and not the tape
     private static final Scalar
             lower_white_bounds = new Scalar(145, 145, 145, 255),
-            upper_white_bounds = new Scalar(255, 255, 255, 255);
+            upper_white_bounds = new Scalar(255, 255, 255, 255),
+            upper_red_bounds = new Scalar(255, 0, 0, 255),
+            lower_red_bounds = new Scalar(140, 28, 28, 255),
+            upper_blue_bounds = new Scalar(0, 0, 255, 255),
+            lower_blue_bounds = new Scalar(32, 41, 161, 255);
 
     // Color definitions
-    private final Scalar WHITE = new Scalar(255, 255, 255);
+    private final Scalar
+                  WHITE = new Scalar(255, 255, 255),
+                  RED = new Scalar(255, 0, 0),
+                  BLUE = new Scalar(0, 0, 255);
+
 
 
     private Mat leftMat = new Mat(REGION_WIDTH, REGION_HEIGHT, CvType.CV_16UC4);
@@ -60,9 +69,9 @@ public class PixelDetection extends OpenCvPipeline {
     private final Point rightMat_pointB = generateMatPointB(RIGHT_MAT_TOPLEFT_ANCHOR_POINT);
 
 
-    private double leftWhitePercent;
-    private double centerWhitePercent;
-    private double rightWhitePercent;
+    private double leftPercent;
+    private double centerPercent;
+    private double rightPercent;
 
     // Running variable storing the parking position
     private volatile BackdropPosition position = BackdropPosition.LEFT;
@@ -78,16 +87,17 @@ public class PixelDetection extends OpenCvPipeline {
         centerMat = createMatRect(input, centerMat_pointA, centerMat_pointB);
         rightMat = createMatRect(input, rightMat_pointA, rightMat_pointB);
 
-        leftWhitePercent = colorPercent(leftMat, lower_white_bounds, upper_white_bounds);
-        centerWhitePercent = colorPercent(centerMat, lower_white_bounds, upper_white_bounds);
-        rightWhitePercent = colorPercent(rightMat, lower_white_bounds, upper_white_bounds);
 
-        double[] whitePercents = new double[] {leftWhitePercent, centerWhitePercent, rightWhitePercent};
-        double highestWhitePercent = Arrays.stream(whitePercents).max().getAsDouble();
+        leftPercent = highestColorPercent(leftMat);
+        centerPercent = highestColorPercent(centerMat);
+        rightPercent = highestColorPercent(rightMat);
+
+        double[] colorPercents = new double[] { leftPercent, centerPercent, rightPercent };
+        double highestColorPercent = Arrays.stream(colorPercents).max().getAsDouble();
 
 
-        // would do switch loop but "case must be constant expression"
-        if (highestWhitePercent == leftWhitePercent)
+        // TODO: add the ability to find *what* color is most common in whichever area, useful for debugging
+        if (highestColorPercent == leftPercent)
         {
             position = BackdropPosition.LEFT;
             Imgproc.rectangle(
@@ -98,7 +108,7 @@ public class PixelDetection extends OpenCvPipeline {
                     2
             );
         }
-        else if (highestWhitePercent == centerWhitePercent)
+        else if (highestColorPercent == centerPercent)
         {
             position = BackdropPosition.CENTER;
             Imgproc.rectangle(
@@ -109,7 +119,7 @@ public class PixelDetection extends OpenCvPipeline {
                     2
             );
         }
-        else if (highestWhitePercent == rightWhitePercent)
+        else if (highestColorPercent == rightPercent)
         {
             position = BackdropPosition.RIGHT;
             Imgproc.rectangle(
@@ -150,11 +160,26 @@ public class PixelDetection extends OpenCvPipeline {
     }
 
 
+    // Remove all pixels that don't match a color between the color range specified and see
+    // how many pixels there are remaining in the image, then find the percentage of these pixels to all of them
     private double colorPercent(Mat blurredMat, Scalar lowerBound, Scalar upperBound) {
-        // Remove all pixels that don't match a color between the color range specified and see
-        // how many pixels there are remaining in the image, then find the percentage of these pixels to all of them
         Core.inRange(blurredMat, lowerBound, upperBound, blurredMat);
         return Core.countNonZero(blurredMat);
+    }
+
+
+    // This calculates the highest percentage of a specific color found inside the mat.
+    // This is for versatility and adaptability in case we can't use a team prop or something and have to
+    // resort to the white pixels.
+    // This searches for red, blue, and white pixels and calculates whichever color has the highest
+    // corresponding pixels.
+    // This could definitely be more versatile (as in passing in custom color bounds to the method),
+    // but the implementation would be a bit too dirty and not really worthwhile.
+    private double highestColorPercent(Mat blurredMat) {
+        return Arrays.stream(new double[]{ colorPercent(blurredMat, lower_white_bounds, upper_white_bounds),
+                colorPercent(blurredMat, lower_red_bounds, upper_red_bounds),
+                colorPercent(blurredMat, lower_blue_bounds, upper_blue_bounds)
+        }).max().getAsDouble();
     }
 
 
@@ -183,16 +208,15 @@ public class PixelDetection extends OpenCvPipeline {
         return position;
     }
 
-    public double getLeftWhitePercent() {
-        return leftWhitePercent;
+    public double getLeftPercent() {
+        return leftPercent;
     }
-    public double getCenterWhitePercent() {
-        return centerWhitePercent;
+    public double getCenterPercent() {
+        return centerPercent;
     }
-    public double getRightWhitePercent() {
-        return rightWhitePercent;
+    public double getRightPercent() {
+        return rightPercent;
     }
 
 
 }
-

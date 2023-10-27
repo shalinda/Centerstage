@@ -1,33 +1,41 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public abstract class Robot extends LinearOpMode {
 
-    protected DcMotorEx drive_rf;
-    protected DcMotorEx drive_rb;
-    protected DcMotorEx drive_lf;
-    protected DcMotorEx drive_lb;
+    protected DcMotorEx rf_drive;
+    protected DcMotorEx rb_drive;
+    protected DcMotorEx lf_drive;
+    protected DcMotorEx lb_drive;
 
-    protected DcMotorEx claw_arm;
-    protected DcMotorEx claw;
+    protected DcMotorEx arm;
+    protected Servo claw_arm;
+    protected Servo claw;
 
     protected double powerFactor = 0;
 
 
     protected void initMotors() {
-        drive_rf = hardwareMap.get(DcMotorEx.class, "drive_rf");
-        drive_rb = hardwareMap.get(DcMotorEx.class, "drive_rb");
-        drive_lf = hardwareMap.get(DcMotorEx.class, "drive_lf");
-        drive_lb = hardwareMap.get(DcMotorEx.class, "drive_lb");
+        rf_drive = hardwareMap.get(DcMotorEx.class, "rf_drive");
+        rb_drive = hardwareMap.get(DcMotorEx.class, "rb_drive");
+        lf_drive = hardwareMap.get(DcMotorEx.class, "lf_drive");
+        lb_drive = hardwareMap.get(DcMotorEx.class, "lb_drive");
 
-        drive_rf.setDirection(DcMotorSimple.Direction.REVERSE);
-        drive_rb.setDirection(DcMotorSimple.Direction.REVERSE);
+        rf_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rb_drive.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        claw_arm = hardwareMap.get(DcMotorEx.class, "claw_arm");
-        claw = hardwareMap.get(DcMotorEx.class, "claw");
+        arm = hardwareMap.get(DcMotorEx.class, "arm");
+        claw_arm = hardwareMap.get(Servo.class, "claw_arm");
+        claw = hardwareMap.get(Servo.class, "claw");
+
+        arm.setDirection(DcMotor.Direction.FORWARD);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        claw.setPosition(0.0);
     }
 
 

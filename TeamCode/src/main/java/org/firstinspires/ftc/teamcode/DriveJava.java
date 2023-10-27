@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+@TeleOp(name = "DriveJava")
 public class DriveJava extends Robot {
 
 
@@ -24,9 +28,20 @@ public class DriveJava extends Robot {
         telemetry.update();
 
         while (opModeIsActive()) {
+
             callSpeedChange();
+            telemetry.update();
+
+            arm.setPower(gamepad2.left_stick_y);
+            claw_arm.setPosition(gamepad2.right_stick_y);
+
+            if (gamepad2.left_trigger > 0) claw.setPosition(0.08); //grab claw
+            if (gamepad2.right_trigger > 0) claw.setPosition(0.00); //drop
+
             moveBot(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+
         }
+
     }
 
 
@@ -98,15 +113,15 @@ public class DriveJava extends Robot {
 
     private void moveBot(float vertical, float pivot, float horizontal) {
 
-        drive_rf.setPower(powerFactor * (-pivot + (vertical - horizontal)));
-        drive_rb.setPower(powerFactor * (-pivot + vertical + horizontal));
-        drive_lf.setPower(powerFactor * (pivot + vertical + horizontal));
-        drive_lb.setPower(powerFactor * (pivot + (vertical - horizontal)));
+        rf_drive.setPower(powerFactor * (-pivot + (vertical - horizontal)));
+        rb_drive.setPower(powerFactor * (-pivot + vertical + horizontal));
+        lf_drive.setPower(powerFactor * (pivot + vertical + horizontal));
+        lb_drive.setPower(powerFactor * (pivot + (vertical - horizontal)));
 
-        drive_rf.setPower(0);
-        drive_rb.setPower(0);
-        drive_lf.setPower(0);
-        drive_lb.setPower(0);
+        rf_drive.setPower(0);
+        rb_drive.setPower(0);
+        lf_drive.setPower(0);
+        lb_drive.setPower(0);
 
     }
 }
